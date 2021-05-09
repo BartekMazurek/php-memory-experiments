@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+
+    nginx:
+        build:
+            context: .
+            dockerfile: ./docker/nginx/Dockerfile
+        container_name: nginx
+        ports:
+            - 8080:80
+        volumes:
+            - '.:/var/www/html/php8'
+            - './docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro'
+        restart: always
+        networks:
+            - test
+
+    php:
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+        container_name: php
+        volumes:
+            - '.:/var/www/html/php8'
+            - './tmp/xdebug:/tmp/xdebug'
+        restart: always
+        networks:
+            - test
+        depends_on:
+            - nginx
+
+networks:
+    test:
+        driver: bridge
